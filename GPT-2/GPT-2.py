@@ -92,18 +92,22 @@ class MultiHeadAttention(nn.Module):
     def __init__(self, num_heads, head_size):
         super().__init__()
         self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+        self.proj = nn.Linear(n_embd, n_embd)
 
     def forward(self, x):
-        return torch.cat([h(x) for h in self.heads], dim=-1)
-
+        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = self.proj(out)
+        return out
+        
 
 class FeedForward(nn.Module):
     """"a linear layer followed by a nonlinearity"""
     def __init__(self, expansion):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(n_embd, n_embd),
+            nn.Linear(n_embd, 4 * n_embd),
             nn.ReLU(),
+            nn.Linear(4 * n_embd, n_embd),
         )
 
     def forward(self, x):
@@ -118,10 +122,12 @@ class Block(nn.Module):
         head_size = n_embd // n_head
         self.sa = MultiHeadAttention(n_head, head_size)
         self.ffwd = FeedForward(n_embd)
+        self.ln1 = nn.LayerNorm(n_embd)
+        self.ln2 = nn.LayerNorm(n_embd)
 
     def forward(self, x):
-        x = self.sa(x)
-        x = self.ffwd(x)
+        x = x + self.sa(self.ln1(x))
+        x = x + self.ffwd(self.ln2(x))
         return x
 
 
@@ -132,10 +138,12 @@ class BigramLanguageModel(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd) # n_embd is the number of embeddings dimensions
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
+        
         self.blocks = nn.Sequential(
             Block(n_embd,n_head=4),
             Block(n_embd,n_head=4),
             Block(n_embd,n_head=4),
+            nn.LayerNorm(n_embd)
         )
         #self.sa_head = MultiHeadAttention(4, n_embd//4) # self attention head
         #self.ffwd = FeedForward(n_embd) # feed forward head
