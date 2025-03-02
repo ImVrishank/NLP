@@ -138,7 +138,6 @@ class BigramLanguageModel(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd) # n_embd is the number of embeddings dimensions
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
-        
         self.blocks = nn.Sequential(
             Block(n_embd,n_head=4),
             Block(n_embd,n_head=4),
