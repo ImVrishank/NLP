@@ -3,11 +3,11 @@
   _ read the data:
   _ `with open('input.txt', 'r', encoding='utf-8') as f:
   _ `text = f.read()`
-  * Now *text* is a long string containing all the data from the dataset.
-   * Take a good look at your dataset and also observe how you could tokenize your data.
-   * Define a few necessary hyperparameters like *vocab_size*, which contain the number of chars in the sequence *text* and *chars* containing all the unique characters, this is very important as we are building a character based model, that is, each character is a token.
-   * `chars = sorted(list(set()))`
-   \* `vocab_size = len(chars)`
+  - Now _text_ is a long string containing all the data from the dataset.
+     * Take a good look at your dataset and also observe how you could tokenize your data.
+     * Define a few necessary hyperparameters like _vocab_size_, which contain the number of chars in the sequence _text_ and _chars_ containing all the unique characters, this is very important as we are building a character based model, that is, each character is a token.
+     \* `chars = sorted(list(set()))`
+     \* `vocab_size = len(chars)`
 - Tokenize your dataset. Here, since we are working on a character based model, each unique character is given a unique integer and mapped to it. _char_to_int_ and _int_to_char_ will be our two maps. The first to encode and the second to decode.
   - Dictionary to go from char to int: `stio = {ch:i for i, ch in ennumerate(chars)}`
   - Dictionary to go from int to char: `itos = { i:ch for i,ch in enumerate(chars)}`
@@ -47,19 +47,13 @@
       - `y = torch.stack([data[i+1:i+block_size+1] for i in ix])`
     - Then return the values we have calculated.
       - `return x, y`
-  - We can now get batches and blocks from either the _train_data_ or the _val_data_. Here i am going to take a batch from the _train_data_:
-    - `xb, yb = get_batch('train')`
-    - _xb_ and _yb_ now look somewhat like this: both are of dimensions (_batch_size_ = 4, _block_size_ = 8)
-      - _xb_ = ` tensor([[24, 43, 58, 5, 57, 1, 46, 43], 
-          [44, 53, 56, 1, 58, 46, 39, 58],
-          [52, 58, 1, 58, 46, 39, 58, 1], 
-          [25, 17, 27, 10, 0, 21, 1, 54]])`
-      - _yb_ = ` tensor([[43, 58, 5, 57, 1, 46, 43, 39], 
-		  [53, 56, 1, 58, 46, 39, 58, 1], 
-		  [58, 1, 58, 46, 39, 58, 1, 46],
-		   [17, 27, 10, 0, 21, 1, 54, 39]])`
-    - We can observe that, when _{24}_ is the context(at _xb_), we have target(at _yb_) as _{43}_, which is the next element in _xb_'s first batch. When we have _{24, 43}_ as the context, we have _{58}_ as the target, and so on. We can also observe that when we have _{24, 43, 58, 5, 57, 1, 46, 43}_ as the context, we have _{39}_ as the target which comes right after the sequence of context in the _train_data_ but is not quiet visible to us in _xb_.
-    -
+  - We can now get batches and blocks from either the _train_data_ or the _val_data_. Here i am going to take a batch from the _train_data_: - `xb, yb = get_batch('train')` - _xb_ and _yb_ now look somewhat like this: both are of dimensions (_batch_size_ = 4, _block_size_ = 8) - _xb_ = ` tensor([[24, 43, 58, 5, 57, 1, 46, 43], 
+  [44, 53, 56, 1, 58, 46, 39, 58],
+  [52, 58, 1, 58, 46, 39, 58, 1], 
+  [25, 17, 27, 10, 0, 21, 1, 54]])` - _yb_ = ` tensor([[43, 58, 5, 57, 1, 46, 43, 39], 
+[53, 56, 1, 58, 46, 39, 58, 1], 
+[58, 1, 58, 46, 39, 58, 1, 46],
+ [17, 27, 10, 0, 21, 1, 54, 39]])` - We can observe that, when _{24}_ is the context(at _xb_), we have target(at _yb_) as _{43}_, which is the next element in _xb_'s first batch. When we have _{24, 43}_ as the context, we have _{58}_ as the target, and so on. We can also observe that when we have _{24, 43, 58, 5, 57, 1, 46, 43}_ as the context, we have _{39}_ as the target which comes right after the sequence of context in the _train_data_ but is not quiet visible to us in _xb_. -
 
 - Visualizing all that we have done till now:
 
@@ -101,7 +95,7 @@
     - We import the torch.nn library as nn
     - We then make an object of the class nn.Embedding. We are going to call this object the _token_embedding_table_. While making this object we need to pass 2 arguments to the constructor of the nn.Embedding class. These arguements are:
       - num_embeddings --> the number of unique token we have in the dataset
-      - embedding_dim --> c value. This defines how we want to store the data of each token. When we say data of each token, we refer to the connections of this token with the other tokens in the same batch. We can choose a high number for _C_. This would increase the clarity of the connections between the different tokens, but at the same time, it would increase computation time. It we used a small number for C, this would mean the computation time would be lesser, but, the clarity in the connections between tokens would be smaller.
+      - embedding*dim --> c value. This defines how we want to store the data of each token. When we say data of each token, we refer to the connections of this token with the other tokens in the same batch. We can choose a high number for \_C*. This would increase the clarity of the connections between the different tokens, but at the same time, it would increase computation time. It we used a small number for C, this would mean the computation time would be lesser, but, the clarity in the connections between tokens would be smaller.
     - At the constructor, it initialized random values in all the cells of the _token_embedding_table_.
     - When the _forward()_ function runs, it takes in the _features_ vector, and passes this as the argument to the object of the nn.Embedding class. That is, the _token_embedding_table_. `logits = self.token_embedding_table(x)` takes in the _features_ vector and makes a table of **(B, T, C)** with the (B, T) table we have seen in the form of _features_ vector. It just extends each of these cells of the (B, T) table and makes it store information in _C_ amount of cells right behind it.
     - The main takeaway is that, it takes in the features table and then makes sure that every token in the _features_ table has _C_ number of cells which store it's information with respect to other tokens in the same batch.
@@ -231,4 +225,274 @@
   - Now we take the dot product of the _wei_ and **Value**:
     - `v = value(x)`
     - `out = wei @ v`
+
+- We also multiply the _wei_ by sqrt(_head_size_). This is done to keep variance of it at 0.
+  - `wei = wei * head_size ** 2`
+- If we don't do this, we would end up with vectors that have variance of the order of _head_size_. This is an issue because if we we have a variance of order _head_size_, then we end up with a vector that looks pretty similar to a one hot vector. This is bad because then we would be taking information from a singular place instead of multiple tokens of the sentence.
+- Now lets just convert this into script code (a .py file from a .pynb file):
+
+```python
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+# hyperparameters
+batch_size = 16 # how many independent sequences will we process in parallel?
+block_size = 32 # what is the maximum context length for predictions?
+max_iters = 5000
+eval_interval = 100
+learning_rate = 1e-3
+device = 'cuda' if torch.cuda.is_available() else 'cpu' # New: explained after code block
+eval_iters = 200 # New: explained after code block
+n_embd = 64 # New: explained after code block
+n_head = 4
+n_layer = 4
+dropout = 0.2 # Explained in detail in the Dropout section of the cleaning up the code.
+# ------------
+torch.manual_seed(1337)
+# getting the data and then reading it
+# wget https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
+with open('input.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+# here are all the unique characters that occur in this text
+chars = sorted(list(set(text)))
+# finding the number of unique chars in the chars
+vocab_size = len(chars)
+# create a mapping from characters to integers
+stoi = { ch:i for i,ch in enumerate(chars) }
+itos = { i:ch for i,ch in enumerate(chars) }
+
+encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
+decode = lambda l: ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
+
+# Train and test splits
+data = torch.tensor(encode(text), dtype=torch.long)
+n = int(0.9*len(data)) # first 90% will be train, rest val (split_fraction)
+train_data = data[:n]
+val_data = data[n:]
+
+# making batches (features and labels) out of the said data split type (train or validation)
+def get_batch(split):
+    # generate a small batch of data of inputs x and targets y
+    data = train_data if split == 'train' else val_data
+    ix = torch.randint(len(data) - block_size, (batch_size,))
+    x = torch.stack([data[i:i+block_size] for i in ix])
+    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+    x, y = x.to(device), y.to(device) # NEW: Explained after code block
+    return x, y
+
+@torch.no_grad()
+
+# calculates the loss and the logits for the specified model and then gives it out
+def estimate_loss():
+    out = {}
+    model.eval() # Setting model to evaluation phase
+    for split in ['train', 'val']:
+        losses = torch.zeros(eval_iters) # An array of zeroes of size eval_iters
+        # this loop just counts indices from 0 to eval_iters-1 and then fills in the losses of the batches in the losses array.
+        for k in range(eval_iters):
+            X, Y = get_batch(split)
+            logits, loss = model(X, Y)
+            losses[k] = loss.item()
+
+        out[split] = losses.mean()
+
+	model.train() # resetting it back to training phase
+    return out # an array of 2 float containing the mean of all the losses of training and validation phases calculated over eval_iters number of batches
+
+
+class Head(nn.Module):
+    """ one head of self-attention """
+    def __init__(self, head_size):
+        super().__init__()
+        # Getting the key, query and the value as mentioned previously.
+        self.key = nn.Linear(n_embd, head_size, bias=False)
+        self.query = nn.Linear(n_embd, head_size, bias=False)
+        self.value = nn.Linear(n_embd, head_size, bias=False)
+        # register_buffer ensures it is not affected by optimizer.step()
+        self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
+        self.dropout = nn.Dropout(dropout) # explained in cleaning up of code (dropout).
+
+   def forward(self, x):
+        B,T,C = x.shape
+        k = self.key(x)   # (B,T,C)
+        q = self.query(x) # (B,T,C)
+        # compute attention scores ("affinities")
+        wei = q @ k.transpose(-2,-1) * C**-0.5 # (B, T, C) @ (B, C, T) -> (B, T, T)
+        wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf')) # (B, T, T)
+        wei = F.softmax(wei, dim=-1) # (B, T, T)
+        wei = self.dropout(wei) # explained in cleaning up of code (dropout)
+        # perform the weighted aggregation of the values
+        v = self.value(x) # (B,T,C)
+        out = wei @ v # (B, T, T) @ (B, T, C) -> (B, T, C)
+        return out
+
+# super simple bigram model
+class BigramLanguageModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # each token directly reads off the logits for the next token from a lookup table
+        self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
+        self.position_embedding_table = nn.Embedding(block_size, n_embd)
+        # interspacing communication multiple times.
+        self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
+        self.ln_f = nn.LayerNorm(n_embd) # final layer norm
+        self.lm_head = nn.Linear(n_embd, vocab_size) # language modelling head
+
+    def forward(self, idx, targets=None):
+        B, T = idx.shape
+        # idx and targets are both (B,T) tensor of integers
+        tok_emb = self.token_embedding_table(idx) # (B,T,C)
+        pos_emb = self.position_embedding_table(torch.arange(T, device=device)) # (T,C)
+        x = tok_emb + pos_emb # (B,T,C)
+        x = self.blocks(x) # (B,T,C)
+        x = self.ln_f(x) # (B,T,C)
+        logits = self.lm_head(x) # (B,T,vocab_size)
+
+		if targets is None:
+            loss = None
+        else:
+            B, T, C = logits.shape
+            logits = logits.view(B*T, C)
+            targets = targets.view(B*T)
+            loss = F.cross_entropy(logits, targets)
+
+        return logits, loss
+
+    def generate(self, idx, max_new_tokens):
+        # idx is (B, T) array of indices in the current context
+        for _ in range(max_new_tokens):
+            # crop idx to the last block_size tokens
+            idx_cond = idx[:, -block_size:]
+            # get the predictions
+            logits, loss = self(idx_cond)
+            # focus only on the last time step
+            logits = logits[:, -1, :] # becomes (B, C)
+            # apply softmax to get probabilities
+            probs = F.softmax(logits, dim=-1) # (B, C)
+            # sample from the distribution
+            idx_next = torch.multinomial(probs, num_samples=1) # (B, 1)
+            # append sampled index to the running sequence
+            idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
+        return idx
+
+model = BigramLanguageModel()
+m = model.to(device) # New: explained after code block
+# print the number of parameters in the model
+print(sum(p.numel() for p in m.parameters())/1e6, 'M parameters')
+# create a PyTorch optimizer
+optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+for iter in range(max_iters):
+    # every once in a while evaluate the loss on train and val sets
+    if iter % eval_interval == 0 or iter == max_iters - 1:
+        losses = estimate_loss()
+        print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+      # sample a batch of data
+    xb, yb = get_batch('train')
+     # evaluate the loss
+    logits, loss = model(xb, yb)
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    optimizer.step()
+
+ # generate from the model
+context = torch.zeros((1, 1), dtype=torch.long, device=device) # New: explained after code block
+print(decode(m.generate(context, max_new_tokens=2000)[0].tolist()))
+```
+
+- Key differences between the .ipynb notebook and the .py file here is:
+  - A few new parameters:
+    - _device_ : this parameter tells the device to run on a gpu if you have got one on your system. Could be either _cuda_ or could be _cpu_.
+      - If `device == 'cuda'`: then we also need to move the model, the batches to gpu as well. When generating output, we also need to specify the device as well.
+    - The _get_estimate()_ function averages up the loss over multiple batches. It averages _eval_iters_ number of batches' average. This is done for both training and validation data. This is way less noisy as the previous one. It basically prints the loss as before but only once every _eval_iters_ number of batches have passed, by averaging out the last _eval_iters_ number of batches' loss.
+    - We also do not need to pass _vocab_size_ since it is a global variable to the constructor of the class _BigramLanguageModel_.
+    - We also introduce the hyperparameter _n_embd_ which stands for the number of parameters and instead of defining the embedding table with _(number of tokens = vocab_size, number of simensions(c) = vocab_size)_, we define it with _(number of tokens = vocab_size, number of dimensions(c) = n_embd)_.
+- Adding to the above code:
+- Now we shall implement the _MultiHeadAttention(nn.Module)_. As per documentation, this is basically running multiple heads of **SelfAttention** parallelly. Then we concatenate the heads at the end.
+  ```python
+  class MultiHeadAttention(nn.Module):
+      """ multiple heads of self-attention in parallel """
+      def **init**(self, num*heads, head_size):
+          super().**init**()
+          # defining a list of all layers of the neural network. We use this instead of a python list because pytorch can analize this in real time unlike in a python list. This list now contains num_heads number of items. where for each cell we call the Head class and pass it head_size for its constructor.
+          self.heads = nn.ModuleList([Head(head_size) for * in range(num_heads)])
+          # for residual connections(explained later)
+          self.proj = nn.Linear(n_embd, n_embd)
+          self.dropout = nn.Dropout(dropout) # explained lated under cleaning up the code
+  ```
+
+def forward(self, x):
+    # concatenating to the list.
+        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = self.dropout(self.proj(out))
+        return out
+
+````
+* Quickly explaining the above code block:
+	* We are creating a daughter class called *MultiHeadAttention(nn.Module)* of the parent class *nn.Module*.
+	* We also earlier created a hyperparameter called *num_heads*. This is the number of heads we are going to run in parallel. So now instead of sending it 32 number of tokens per batch at once, we can just send 32 / 4 = 8 tokens and then say we want to process 4 of them parallelly and then just concatenate the 4 results of heads at the end and then we would still end up with the same output as before.
+
+* Now we can implement the *FeedForward* part to our transformer. This is done to improve the working of the model. Until now, all the models we have used are linear. This is a huge issue. As the entire model is a massive Linear function without a *FeedForward*. We do not want that. We want it to also be able to take in non linear functions into play. This is exactly what *FeedForward* does.
+* How does it introduce Non-linearity? It uses activation functions like **RelU** and **Leaky-RelU**.
+* So initially if we had a neural network that did $$initially:  f(a, b) = a + b $$ meaning it would give output like this:$$hence: f(-5, 4) = -5 + 4 = -1$$Now after adding the FeedForward network:
+ $$after FeedForward: F(a+b) = RelU(a) + RelU(b)$$
+  Meaning it would give outputs as such:
+ $$hence: F(-5, 4) = Relu(-5) + RelU(4) =>F(-5,4) 0 + 4 =>F(-5,4) = 4 $$
+ ```python
+ class FeedFoward(nn.Module):
+    """ a simple linear layer followed by a non-linearity """
+    def __init__(self, n_embd):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4 * n_embd),
+            nn.ReLU(),
+            nn.Linear(4 * n_embd, n_embd),
+            nn.Dropout(dropout),
+        )
+
+	def forward(self, x):
+        return self.net(x)
+````
+
+- Now we can introduce the _Block_. This is basically an amalgamation of all The entire transformer architecture. Here we are basically connecting all the dots and connections for all the other parts of the architecture that we have worked on till now.
+
+```python
+class Block(nn.Module):
+    """ Transformer block: communication followed by computation """
+     def __init__(self, n_embd, n_head):
+        # n_embd: embedding dimension, n_head: the number of heads we'd like
+        super().__init__()
+        head_size = n_embd // n_head # explained in first point
+        self.sa = MultiHeadAttention(n_head, head_size) # Self attention
+        self.ffwd = FeedFoward(n_embd) # calling of the feedforward class
+        self.ln1 = nn.LayerNorm(n_embd) # explained in LayerNorm
+        self.ln2 = nn.LayerNorm(n_embd)  # also explained in LayerNorm
+
+	def forward(self, x):
+		# residual connections by using x = x + (deviated value)
+		# LayerNorm by altering deviated value by (self.sa(self.ln1(x))) before the Self attention and altering deviated value by (self.ffwd(ln2(x))) before the FeedForward sections. Not similar to the architecture diagram below as we are implemeting LayerNorm before FeedForward as in case of ln1 and before Self Attention in case of ln2.
+        x = x + self.sa(self.ln1(x)) # residual connections and LayerNorm
+        x = x + self.ffwd(self.ln2(x)) # residual connections and LayerNorm
+        return x
+```
+
+- `head_size = n_embd // n_head` This is basically the implementation of the _MultiHeadAttention_ as explained above.
+- Now that we have this, we have a proper working model of the transformer. But, this is now a deep neural network, which has a few optimization problems, let us take a look at how to set that right. We have two methods we are implementing here:
+- **Residual connections**:
+
+  - ![[Pasted image 20250313185739.png]]
+  - The two connections shown above are the residual connections in the transformer architecture. In very simple terms it is a highway where the information is stored and then any changes made by the _FeedForward_ section will be added to the highway, as opposed to just changing the value each iteration of the _FeedForward_. Initially the _Residual connections_ do not provide much info on the highway. As the optimization goes on, we would see a drastic rise in the contributions of the _Residual connections_ and decrease in the contributions of the _FeedForward_ block.
+  - So we fork off the highway and do computations through the _FeedForward_ network and then rejoin the highway.
+
+- **LayerNorm**(Not implemented in my .ipynb notebook):
+  - ![[Pasted image 20250313190744.png]]
+  - These Red lines point to the _LayerNorm_ on the Transformer architecture. We want to normalize rows instead of columns here.
+  - The above architecture is pretty old, nowadays we apply the `Add & Norm` before the _FeedForward_. We have implemented the newer version of this. See how we in the above code block we have applied it on x before sending it to the Self attention and the FeedForward sections.
+- **Cleaning up code:**
+  - We introduce two new hyperparameters _n_layers_ and _n_heads_ that specifies the number of new layers we have and the number of heads respectively.
+  - Added **Dropout**. It is basically something you add right as the deviation from the separated path (**Residual connection** reference) joins the highway again.
+    - **Dropout** in very simple terms shuts off some random nodes of the neural network from communicating to the next nodes.
+    - ![[Pasted image 20250313193156.png]]
+    - This is very helpful because when we randomly shut off a few nodes, we get multiple subnetworks trained. In the end we just put all of these subnetworks together to make a way more robust neural network.
+    - It works as a regularization technique and helps beat overfitting.
+    - We define the hyperparameter _dropout_, which is the percent of nodes we want to dropout.
   -
