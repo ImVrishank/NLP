@@ -3,11 +3,11 @@
   _ read the data:
   _ `with open('input.txt', 'r', encoding='utf-8') as f:
   _ `text = f.read()`
-  - Now _text_ is a long string containing all the data from the dataset.
-     * Take a good look at your dataset and also observe how you could tokenize your data.
-     * Define a few necessary hyperparameters like _vocab_size_, which contain the number of chars in the sequence _text_ and _chars_ containing all the unique characters, this is very important as we are building a character based model, that is, each character is a token.
-     \* `chars = sorted(list(set()))`
-     \* `vocab_size = len(chars)`
+  * Now *text* is a long string containing all the data from the dataset.
+   * Take a good look at your dataset and also observe how you could tokenize your data.
+   * Define a few necessary hyperparameters like *vocab_size*, which contain the number of chars in the sequence *text* and *chars* containing all the unique characters, this is very important as we are building a character based model, that is, each character is a token.
+   * `chars = sorted(list(set()))`
+   \* `vocab_size = len(chars)`
 - Tokenize your dataset. Here, since we are working on a character based model, each unique character is given a unique integer and mapped to it. _char_to_int_ and _int_to_char_ will be our two maps. The first to encode and the second to decode.
   - Dictionary to go from char to int: `stio = {ch:i for i, ch in ennumerate(chars)}`
   - Dictionary to go from int to char: `itos = { i:ch for i,ch in enumerate(chars)}`
@@ -47,13 +47,19 @@
       - `y = torch.stack([data[i+1:i+block_size+1] for i in ix])`
     - Then return the values we have calculated.
       - `return x, y`
-  - We can now get batches and blocks from either the _train_data_ or the _val_data_. Here i am going to take a batch from the _train_data_: - `xb, yb = get_batch('train')` - _xb_ and _yb_ now look somewhat like this: both are of dimensions (_batch_size_ = 4, _block_size_ = 8) - _xb_ = ` tensor([[24, 43, 58, 5, 57, 1, 46, 43], 
-  [44, 53, 56, 1, 58, 46, 39, 58],
-  [52, 58, 1, 58, 46, 39, 58, 1], 
-  [25, 17, 27, 10, 0, 21, 1, 54]])` - _yb_ = ` tensor([[43, 58, 5, 57, 1, 46, 43, 39], 
-[53, 56, 1, 58, 46, 39, 58, 1], 
-[58, 1, 58, 46, 39, 58, 1, 46],
- [17, 27, 10, 0, 21, 1, 54, 39]])` - We can observe that, when _{24}_ is the context(at _xb_), we have target(at _yb_) as _{43}_, which is the next element in _xb_'s first batch. When we have _{24, 43}_ as the context, we have _{58}_ as the target, and so on. We can also observe that when we have _{24, 43, 58, 5, 57, 1, 46, 43}_ as the context, we have _{39}_ as the target which comes right after the sequence of context in the _train_data_ but is not quiet visible to us in _xb_. -
+  - We can now get batches and blocks from either the _train_data_ or the _val_data_. Here i am going to take a batch from the _train_data_:
+    - `xb, yb = get_batch('train')`
+    - _xb_ and _yb_ now look somewhat like this: both are of dimensions (_batch_size_ = 4, _block_size_ = 8)
+      - _xb_ = ` tensor([[24, 43, 58, 5, 57, 1, 46, 43], 
+          [44, 53, 56, 1, 58, 46, 39, 58],
+          [52, 58, 1, 58, 46, 39, 58, 1], 
+          [25, 17, 27, 10, 0, 21, 1, 54]])`
+      - _yb_ = ` tensor([[43, 58, 5, 57, 1, 46, 43, 39], 
+		  [53, 56, 1, 58, 46, 39, 58, 1], 
+		  [58, 1, 58, 46, 39, 58, 1, 46],
+		   [17, 27, 10, 0, 21, 1, 54, 39]])`
+    - We can observe that, when _{24}_ is the context(at _xb_), we have target(at _yb_) as _{43}_, which is the next element in _xb_'s first batch. When we have _{24, 43}_ as the context, we have _{58}_ as the target, and so on. We can also observe that when we have _{24, 43, 58, 5, 57, 1, 46, 43}_ as the context, we have _{39}_ as the target which comes right after the sequence of context in the _train_data_ but is not quiet visible to us in _xb_.
+    -
 
 - Visualizing all that we have done till now:
 
@@ -95,7 +101,7 @@
     - We import the torch.nn library as nn
     - We then make an object of the class nn.Embedding. We are going to call this object the _token_embedding_table_. While making this object we need to pass 2 arguments to the constructor of the nn.Embedding class. These arguements are:
       - num_embeddings --> the number of unique token we have in the dataset
-      - embedding*dim --> c value. This defines how we want to store the data of each token. When we say data of each token, we refer to the connections of this token with the other tokens in the same batch. We can choose a high number for \_C*. This would increase the clarity of the connections between the different tokens, but at the same time, it would increase computation time. It we used a small number for C, this would mean the computation time would be lesser, but, the clarity in the connections between tokens would be smaller.
+      - embedding_dim --> c value. This defines how we want to store the data of each token. When we say data of each token, we refer to the connections of this token with the other tokens in the same batch. We can choose a high number for _C_. This would increase the clarity of the connections between the different tokens, but at the same time, it would increase computation time. It we used a small number for C, this would mean the computation time would be lesser, but, the clarity in the connections between tokens would be smaller.
     - At the constructor, it initialized random values in all the cells of the _token_embedding_table_.
     - When the _forward()_ function runs, it takes in the _features_ vector, and passes this as the argument to the object of the nn.Embedding class. That is, the _token_embedding_table_. `logits = self.token_embedding_table(x)` takes in the _features_ vector and makes a table of **(B, T, C)** with the (B, T) table we have seen in the form of _features_ vector. It just extends each of these cells of the (B, T) table and makes it store information in _C_ amount of cells right behind it.
     - The main takeaway is that, it takes in the features table and then makes sure that every token in the _features_ table has _C_ number of cells which store it's information with respect to other tokens in the same batch.
@@ -418,7 +424,6 @@ print(decode(m.generate(context, max_new_tokens=2000)[0].tolist()))
           # for residual connections(explained later)
           self.proj = nn.Linear(n_embd, n_embd)
           self.dropout = nn.Dropout(dropout) # explained lated under cleaning up the code
-  ```
 
 def forward(self, x):
     # concatenating to the list.
